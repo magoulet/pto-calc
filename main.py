@@ -51,6 +51,7 @@ if __name__ == '__main__':
 
     results = pd.DataFrame(data)
     results.columns=['Year', 'Month', 'periodStart', 'PPT', 'Sick', 'Vac', 'sickLost', 'vacLost', 'Days']
+    print("PTO hours left over at end of given period\n")
     print(results)
 
     plt.style.use('ggplot')
