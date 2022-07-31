@@ -52,7 +52,7 @@ if __name__ == '__main__':
     results = pd.DataFrame(data)
     results.columns=['Year', 'Month', 'periodStart', 'PPT', 'Sick', 'Vac', 'sickLost', 'vacLost', 'Days']
     print("PTO hours left over at end of given period\n")
-    print(results)
+    print(results[results['periodStart'] > (dt.date.today() - dt.timedelta(1*365/12))])
 
     plt.style.use('ggplot')
     fig, ax = plt.subplots(figsize=(10,5))
