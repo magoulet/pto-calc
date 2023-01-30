@@ -46,11 +46,15 @@ if __name__ == '__main__':
                 vac.forward(tenureYear)
                 sick.forward(year, month)
 
+            # Find last day of month
+            d = dt.date(startYear+year, month+1,1)
+            lastDayOfMonth = dt.date(d.year, d.month, cal.monthrange(d.year, d.month)[-1])
+
             # print('{:<2.0f} {:>6} {:>5.1f} {:>5.1f} {:>5.1f} {:>5.1f} {:>5.0f}'.format(startYear+year, cal.month_abbr[month+1], ppt.bal, sick.bal, vac.bal, sick.lost, sum([ppt.bal, sick.bal, vac.bal])/8))
-            data.append([startYear+year, cal.month_abbr[month+1], dt.date(startYear+year, month+1,1), ppt.bal, sick.bal, vac.bal, sick.lost/8, vac.lost/8, sum([ppt.bal, sick.bal, vac.bal])/8])
+            data.append([startYear+year, cal.month_abbr[month+1], lastDayOfMonth, ppt.bal, sick.bal, vac.bal, sick.lost/8, vac.lost/8, sum([ppt.bal, sick.bal, vac.bal])/8])
 
     results = pd.DataFrame(data)
-    results.columns=['Year', 'Month', 'periodStart', 'PPT', 'Sick', 'Vac', 'sickLost', 'vacLost', 'Days']
+    results.columns=['Year', 'Month', 'periodEnd', 'PPT', 'Sick', 'Vac', 'sickLost', 'vacLost', 'Days']
     print("PTO hours left over at end of given period\n")
     print(results[results['periodStart'] > (dt.date.today() - dt.timedelta(2*365/12))])
 
