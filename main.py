@@ -56,15 +56,15 @@ if __name__ == '__main__':
     results = pd.DataFrame(data)
     results.columns=['Year', 'Month', 'periodEnd', 'PPT', 'Sick', 'Vac', 'sickLost', 'vacLost', 'Days']
     print("PTO hours left over at end of given period\n")
-    print(results[results['periodStart'] > (dt.date.today() - dt.timedelta(2*365/12))])
+    print(results[results['periodEnd'] > (dt.date.today() - dt.timedelta(2*365/12))])
 
     plt.style.use('ggplot')
     fig, ax = plt.subplots(figsize=(10,5))
-    ax.plot(results['periodStart'], results['Days'], marker='o')
-    ax.stackplot(results['periodStart'], results['PPT']/8, results['Sick']/8, results['Vac']/8)
-    ax.stackplot(results['periodStart'], results['sickLost'], results['vacLost'], colors=['red', 'blue'])
+    ax.plot(results['periodEnd'], results['Days'], marker='o')
+    ax.stackplot(results['periodEnd'], results['PPT']/8, results['Sick']/8, results['Vac']/8)
+    ax.stackplot(results['periodEnd'], results['sickLost'], results['vacLost'], colors=['red', 'blue'])
     ax.set(title='Paid Time Off (days)',
            ylabel='Days',
-           xlabel='Date')
+           xlabel='Period End Date')
     ax.legend(['PTO', 'PPT', 'Sick', 'Vac', 'Lost (PPT)','Lost (Vac)'], loc='best')
     plt.show()
