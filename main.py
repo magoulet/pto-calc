@@ -4,6 +4,7 @@ import calendar as cal
 import datetime as dt
 import matplotlib.pyplot as plt
 import pandas as pd
+from pathlib import Path
 from pto_classes import *
 
 def readTransactions(filename, sheetName):
@@ -67,4 +68,10 @@ if __name__ == '__main__':
            ylabel='Days',
            xlabel='Period End Date')
     ax.legend(['PTO', 'PPT', 'Sick', 'Vac', 'Lost (PPT)','Lost (Vac)'], loc='best')
+
+
+    current_dir = Path(__file__).resolve().parent
+    filename = 'pto_plot.png'
+    file_path = current_dir / filename
+    plt.savefig(file_path)
     plt.show()
