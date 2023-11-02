@@ -69,6 +69,9 @@ if __name__ == '__main__':
            xlabel='Period End Date')
     ax.legend(['PTO', 'PPT', 'Sick', 'Vac', 'Lost (PPT)','Lost (Vac)'], loc='best')
 
+    # Adding a vertical line for today's date
+    today = dt.date.today()
+    ax.axvline(today, color='red', linestyle='--')
 
     current_dir = Path(__file__).resolve().parent
     filename = 'pto_plot.png'
