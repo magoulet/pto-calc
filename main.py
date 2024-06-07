@@ -26,7 +26,7 @@ if __name__ == '__main__':
     filename = 'amazon_vacation_schedule.ods'
     used = readTransactions(filename, 'baseline')
 
-    years = 4
+    years = 6
     months = 12
     startMonth = 3
     startYear  = 2021
