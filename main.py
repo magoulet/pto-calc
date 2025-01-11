@@ -1,80 +1,184 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-import calendar as cal
 import datetime as dt
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import pandas as pd
-from pathlib import Path
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
 from pto_classes import *
 
-def readTransactions(filename, sheetName):
-    df = pd.read_excel(filename, engine="odf", sheet_name=sheetName, usecols='C:G', index_col=[0,1])
+
+def read_schedule(filename, sheetName):
+    df = pd.read_excel(filename, 
+                       engine="odf", 
+                       sheet_name=sheetName,
+                       usecols='A:C', 
+                       parse_dates=['end_date'],
+                       )
+    
+    df['flexible'] = pd.to_numeric(df['flexible'], errors='coerce')
+    df['standard'] = pd.to_numeric(df['standard'], errors='coerce')
     return df
 
 
-def tenure(year, month, startMonth, tenureYear):
-    if year > 0 and ((month - startMonth)%12 == 0):
-        tenureYear += 1
-    return tenureYear
+def plot_pto_results(results: pd.DataFrame, save_path: Path = None) -> go.Figure:
+    """
+    Create an interactive plot of PTO results using plotly.
+    
+    Args:
+        results (pd.DataFrame): DataFrame containing PTO data with columns:
+            'periodEnd', 'Total Days', 'Flexible', 'Standard', 'Flexible Lost', 'Std Lost'
+        save_path (Path, optional): Path to save the plot. Defaults to None.
+    
+    Returns:
+        go.Figure: Plotly figure object
+    """
+    
+    # Create figure
+    fig = go.Figure()
 
+    # Add traces
+    # Total Days line
+    fig.add_trace(
+        go.Scatter(
+            x=results['periodEnd'],
+            y=results['Total Days'],
+            mode='lines+markers',
+            name='PTO'
+        )
+    )
+
+    # Add stacked area plots for Flexible and Standard
+    fig.add_trace(
+        go.Scatter(
+            x=results['periodEnd'],
+            y=results['Flexible']/8,
+            name='Flexible',
+            fill='tonexty',
+            stackgroup='one'
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=results['periodEnd'],
+            y=results['Standard']/8,
+            name='Standard',
+            fill='tonexty',
+            stackgroup='one'
+        )
+    )
+
+    # Add stacked area plots for Lost hours
+    fig.add_trace(
+        go.Scatter(
+            x=results['periodEnd'],
+            y=results['Flexible Lost']/8,
+            name='Lost (Flexible)',
+            fill='tonexty',
+            stackgroup='two',
+            line=dict(color='red')
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=results['periodEnd'],
+            y=results['Std Lost']/8,
+            name='Lost (Std)',
+            fill='tonexty',
+            stackgroup='two',
+            line=dict(color='blue')
+        )
+    )
+
+    # Add vertical line for today
+    fig.add_vline(
+        x=dt.date.today(),
+        line_dash="dash",
+        line_color="red"
+    )
+
+    # Update layout
+    fig.update_layout(
+        title='Paid Time Off (days)',
+        xaxis_title='Period End Date',
+        yaxis_title='Days',
+        template='plotly_white',
+        showlegend=True,
+        legend=dict(
+            yanchor="top",
+            y=0.99,
+            xanchor="left",
+            x=0.01
+        ),
+        width=1000,
+        height=500,
+        plot_bgcolor='white',
+        xaxis=dict(
+            showgrid=True,
+            gridwidth=1,
+            gridcolor='lightgray'
+        ),
+        yaxis=dict(
+            showgrid=True,
+            gridwidth=1,
+            gridcolor='lightgray'
+        ),
+        hovermode='x unified'
+    )
+
+    # Customize hover template
+    fig.update_traces(
+        hovertemplate='Date: %{x}<br>Days: %{y:.1f}<extra></extra>'
+    )
+
+    # Save if path provided
+    if save_path:
+        if save_path.suffix == '.html':
+            fig.write_html(save_path)
+        else:
+            fig.write_image(save_path)
+
+    return fig
 
 if __name__ == '__main__':
-    ppt = PPT()
-    sick = Sick()
-    vac = Vac()
+    flexible = FlexiblePTO()
+    standard = StandardPTO()
 
     filename = 'amazon_vacation_schedule.ods'
-    used = readTransactions(filename, 'baseline')
+    schedule = read_schedule(filename, 'baseline')
 
-    years = 6
-    months = 12
-    startMonth = 3
-    startYear  = 2021
-    tenureYear = 0
     data = []
-    # print('{:<} {:>4} {:>5} {:>5} {:>5} {:>5} {:>5}'.format('Year', 'Month', 'PPT', 'Sick', 'Vac', 'Lost', 'Days'))
 
-    for year in range(years):
-        for month in range(months):
-            if (year == 0 and month >= startMonth) or year > 0:
-                tenureYear = tenure(year, month, startMonth, tenureYear)
+    for row in schedule.itertuples():
+        flexible.use(row.flexible, row.end_date)
+        standard.use(row.standard, row.end_date)
 
-                ppt.use(used.loc[year, month]['ppt'], year, month)
-                vac.use(used.loc[year, month]['vac'], year, month)
-                sick.use(used.loc[year, month]['sick'], year, month)
+        flexible.forward(row.end_date)
+        standard.forward(row.end_date)
 
-                ppt.forward(year, month, sick)
-                vac.forward(tenureYear)
-                sick.forward(year, month)
-
-            # Find last day of month
-            d = dt.date(startYear+year, month+1,1)
-            lastDayOfMonth = dt.date(d.year, d.month, cal.monthrange(d.year, d.month)[-1])
-
-            # print('{:<2.0f} {:>6} {:>5.1f} {:>5.1f} {:>5.1f} {:>5.1f} {:>5.0f}'.format(startYear+year, cal.month_abbr[month+1], ppt.bal, sick.bal, vac.bal, sick.lost, sum([ppt.bal, sick.bal, vac.bal])/8))
-            data.append([startYear+year, cal.month_abbr[month+1], lastDayOfMonth, ppt.bal, sick.bal, vac.bal, sick.lost/8, vac.lost/8, sum([ppt.bal, sick.bal, vac.bal])/8])
+        data.append([
+            row.end_date, 
+            flexible.bal, 
+            standard.bal, 
+            flexible.lost,
+            standard.lost, 
+            sum([flexible.bal, standard.bal])/8
+            ])
 
     results = pd.DataFrame(data)
-    results.columns=['Year', 'Month', 'periodEnd', 'PPT', 'Sick', 'Vac', 'sickLost', 'vacLost', 'Days']
+    results.columns=[
+        'periodEnd', 
+        'Flexible', 
+        'Standard', 
+        'Flexible Lost', 
+        'Std Lost', 
+        'Total Days',
+        ]
     print("PTO hours left over at end of given period\n")
-    print(results[results['periodEnd'] > (dt.date.today() - dt.timedelta(2*365/12))])
+    print(results)
 
-    plt.style.use('ggplot')
-    fig, ax = plt.subplots(figsize=(10,5))
-    ax.plot(results['periodEnd'], results['Days'], marker='o')
-    ax.stackplot(results['periodEnd'], results['PPT']/8, results['Sick']/8, results['Vac']/8)
-    ax.stackplot(results['periodEnd'], results['sickLost'], results['vacLost'], colors=['red', 'blue'])
-    ax.set(title='Paid Time Off (days)',
-           ylabel='Days',
-           xlabel='Period End Date')
-    ax.legend(['PTO', 'PPT', 'Sick', 'Vac', 'Lost (PPT)','Lost (Vac)'], loc='best')
-
-    # Adding a vertical line for today's date
-    today = dt.date.today()
-    ax.axvline(today, color='red', linestyle='--')
-
-    current_dir = Path(__file__).resolve().parent
-    filename = 'pto_plot.png'
-    file_path = current_dir / filename
-    plt.savefig(file_path)
-    plt.show()
+    fig = plot_pto_results(results)
+    fig.show()

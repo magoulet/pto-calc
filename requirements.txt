@@ -1,5 +1,6 @@
-odfpy
-seaborn
-pandas
-matplotlib
 datetime
+matplotlib
+odfpy
+pandas
+plotly
+pyyaml
