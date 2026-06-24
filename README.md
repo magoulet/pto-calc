@@ -2,7 +2,7 @@
 
 The Amazon PTO Calculator is a Python script designed to calculate and visualize the Paid Time Off (PTO) hours for Amazon corporate staff. It retrieves PTO data from an OpenDocument Spreadsheet (`amazon_vacation_schedule.ods`) and performs calculations based on the specified parameters. 
 
-User-specific configuration is stored in `config.yaml` (you can copy `config.yaml.example` to `config.yaml` and modify configuration as needed.
+User-specific configuration is stored in `config.toml` (you can copy `config.toml.example` to `config.toml` and modify configuration as needed.
 
 The path to `amazon_vacation_schedule.ods` is set via the `schedule_file` key in `config.yaml`. The spreadsheet should follow the schema:
 
@@ -22,7 +22,7 @@ Where:
 To use the Amazon PTO Calculator, follow these steps:
 
 1. Ensure `amazon_vacation_schedule.ods` exists and set its path in `config.yaml` under the `schedule_file` key.
-2. Copy `config.yaml.example` to `config.yaml` and adjust the parameters as needed
+2. Copy `config.toml.example` to `config.toml` and adjust the parameters as needed
 3. Run the script using the following command:
 
    ```
