@@ -1,12 +1,11 @@
 from datetime import datetime
+from typing import Any, Dict
 
 from dateutil.relativedelta import relativedelta
 
-from config_loader import config
-
 
 class FlexiblePTO:
-    def __init__(self):
+    def __init__(self, config: Dict[str, Any]):
         self.type = 'Flexible'
         self.bal = config['flexible_pto']['start_balance']
         self.maxRollover = config['flexible_pto']['max_rollover']
@@ -54,7 +53,7 @@ class FlexiblePTO:
 
 
 class StandardPTO:
-    def __init__(self):
+    def __init__(self, config: Dict[str, Any]):
         self.type = 'Std'
         self.bal = config['standard_pto']['start_balance']
         self.maxRollover = config['standard_pto']['max_rollover']
@@ -66,7 +65,6 @@ class StandardPTO:
 
     def forward(self, eom_date):
         monthNo = eom_date.month
-        # tenure_years = eom_date.year - self.startDate.year
         tenure_years = relativedelta(eom_date, self.startDate).years
 
         # Rollover event on Jan 1

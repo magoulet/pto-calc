@@ -3,3 +3,4 @@ matplotlib
 odfpy
 pandas
 plotly
+pydantic

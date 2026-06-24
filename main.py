@@ -143,10 +143,10 @@ def plot_pto_results(results: pd.DataFrame, save_path: Path = None) -> go.Figure
 
 if __name__ == '__main__':
     from config_loader import config
-    flexible = FlexiblePTO()
-    standard = StandardPTO()
+    flexible = FlexiblePTO(config.model_dump())
+    standard = StandardPTO(config.model_dump())
 
-    filename = config['schedule_file']
+    filename = config.schedule_file
     schedule = read_schedule(filename, 'baseline')
 
     data = []
