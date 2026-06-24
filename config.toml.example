@@ -1,5 +1,5 @@
-employment_start_date = "2020-01-01"
-schedule_file = "/path/to/amazon_vacation_schedule.ods"
+employment_start_date = "YYYY-MM-DD"
+schedule_file = "/path/to/pto_schedule.ods"
 
 [standard_pto]
 start_balance = 0
