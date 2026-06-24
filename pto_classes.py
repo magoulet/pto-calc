@@ -47,8 +47,10 @@ class FlexiblePTO:
         if qty > 0:
             if self.bal >= abs(qty):
                 self.bal -= abs(qty)
+                return True
             else:
-                print('{} bank insufficient (requested {}, balance {}, Year {}, Month {})'.format(self.type, qty, self.bal, eom_date.year, eom_date.month))
+                return False
+        return True
 
 
 class StandardPTO:
@@ -86,5 +88,7 @@ class StandardPTO:
         if qty > 0:
             if self.bal >= abs(qty):
                 self.bal -= abs(qty)
+                return True
             else:
-                print('{} bank insufficient (requested {}, balance {}, Year {}, Month {})'.format(self.type, qty, self.bal, eom_date.year, eom_date.month))
+                return False
+        return True

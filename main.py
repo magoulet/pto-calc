@@ -1,12 +1,10 @@
 import datetime as dt
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import pandas as pd
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
-from pto_classes import *
+from pto_classes import FlexiblePTO, StandardPTO
 
 
 def read_schedule(filename, sheetName):
