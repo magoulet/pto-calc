@@ -13,15 +13,16 @@
 - **Core modules:**
   - `main.py` — reads ODS spreadsheet, drives `FlexiblePTO` / `StandardPTO`, generates plotly chart
   - `pto_classes.py` — PTO accrual, rollover, and cap logic
-  - `config_loader.py` — loads and validates `config.toml`
-- **Data source:** `amazon_vacation_schedule.ods` (OpenDocument Spreadsheet, gitignored). Path is read from `config['schedule_file']`; sheet name is hardcoded as `'baseline'` in `main.py`.
+  - `config_loader.py` — loads and validates `config.toml` using Pydantic models
+  - `config_models.py` — Pydantic schemas for config validation
+- **Data source:** `amazon_vacation_schedule.ods` (OpenDocument Spreadsheet, gitignored). Path is read from `config.schedule_file`; sheet name is hardcoded as `'baseline'` in `main.py`.
 
 ## Critical Gotchas
 
-- **`config.toml` is required at import time.** `config_loader.py` loads it at module level (`config = load_config()`). Any import of `pto_classes` or `config_loader` will crash if `config.toml` is missing — this affects testing, REPL imports, etc.
+- **`config.toml` is required at import time.** `config_loader.py` loads it at module level (`config = load_config()`). Any import of `config_loader` will crash if `config.toml` is missing. `pto_classes.py` now accepts config as a constructor parameter, so it can be imported and tested without a config file.
 - **Direct dependency gap:** `pto_classes.py` imports `dateutil.relativedelta`, but `python-dateutil` is not listed in `requirements.txt`. It installs transitively via `pandas`, but do not remove it without adding the explicit dependency.
 - **`*.toml` and `*.ods` are gitignored.** Never commit `config.toml` or the vacation spreadsheet.
-- **No tests exist.** There is no test runner config (`pytest`, `tox`, etc.).
+- **Tests exist.** Run with `.venv/bin/pytest`. `test_pto_classes.py` covers accrual, rollover, cap, and use logic for both PTO types.
 
 ## Environment
 
@@ -31,4 +32,6 @@
 
 ## Verification
 
-- There is no lint, typecheck, or test command defined. The only verification step is running `python main.py` and checking the plotly output.
+- Run tests: `.venv/bin/pytest`
+- Run script: `.venv/bin/python main.py`
+- The only manual verification step is checking the plotly output.
