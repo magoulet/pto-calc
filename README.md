@@ -4,7 +4,7 @@ The Amazon PTO Calculator is a Python script designed to calculate and visualize
 
 User-specific configuration is stored in `config.yaml` (you can copy `config.yaml.example` to `config.yaml` and modify configuration as needed.
 
-The script requires the `amazon_vacation_schedule.ods` file to be located in the same directory as the main script. The spreadsheet should follow the schema:
+The path to `amazon_vacation_schedule.ods` is set via the `schedule_file` key in `config.yaml`. The spreadsheet should follow the schema:
 
 | end_date  | standard | flexible |
 |-----------|----------|----------|
@@ -21,7 +21,7 @@ Where:
 
 To use the Amazon PTO Calculator, follow these steps:
 
-1. Place the `amazon_vacation_schedule.ods` file in the same directory as the main script.
+1. Ensure `amazon_vacation_schedule.ods` exists and set its path in `config.yaml` under the `schedule_file` key.
 2. Copy `config.yaml.example` to `config.yaml` and adjust the parameters as needed
 3. Run the script using the following command:
 
