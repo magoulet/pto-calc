@@ -3,4 +3,3 @@ matplotlib
 odfpy
 pandas
 plotly
-pyyaml

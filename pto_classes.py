@@ -10,7 +10,7 @@ class FlexiblePTO:
         self.type = 'Flexible'
         self.bal = config['flexible_pto']['start_balance']
         self.maxRollover = config['flexible_pto']['max_rollover']
-        self.cap = config['flexible_pto']['cap']
+        self.cap = config['flexible_pto'].get('cap')
         self.annualGrant = config['flexible_pto']['annual_grant']
         self.startDate = datetime.strptime(config['employment_start_date'], '%Y-%m-%d')
         self.lost = 0
@@ -56,7 +56,7 @@ class StandardPTO:
         self.type = 'Std'
         self.bal = config['standard_pto']['start_balance']
         self.maxRollover = config['standard_pto']['max_rollover']
-        self.cap = config['standard_pto']['cap']
+        self.cap = config['standard_pto'].get('cap')
         self.startDate = datetime.strptime(config['employment_start_date'], '%Y-%m-%d')
         self.lost = 0
         self.accrual = [x / 12 for x in config['standard_pto']['yearly_accrual']]
