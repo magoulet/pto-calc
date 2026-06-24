@@ -5,7 +5,7 @@ import yaml
 
 def validate_config(config: Dict[str, Any]) -> None:
     """Validate that all required configuration items exist"""
-    required_sections = ['employment_start_date', 'standard_pto', 'flexible_pto']
+    required_sections = ['employment_start_date', 'standard_pto', 'flexible_pto', 'schedule_file']
     for section in required_sections:
         if section not in config:
             raise ValueError(f"Missing required config section: {section}")

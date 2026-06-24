@@ -144,10 +144,11 @@ def plot_pto_results(results: pd.DataFrame, save_path: Path = None) -> go.Figure
     return fig
 
 if __name__ == '__main__':
+    from config_loader import config
     flexible = FlexiblePTO()
     standard = StandardPTO()
 
-    filename = 'amazon_vacation_schedule.ods'
+    filename = config['schedule_file']
     schedule = read_schedule(filename, 'baseline')
 
     data = []
