@@ -1,7 +1,10 @@
+import logging
 from datetime import datetime
 from typing import Any, Dict
 
 from dateutil.relativedelta import relativedelta
+
+logger = logging.getLogger(__name__)
 
 
 class FlexiblePTO:
@@ -48,6 +51,10 @@ class FlexiblePTO:
                 self.bal -= abs(qty)
                 return True
             else:
+                logger.warning(
+                    "%s: insufficient balance on %s — requested %s, have %s",
+                    self.type, eom_date.date(), qty, self.bal,
+                )
                 return False
         return True
 
@@ -61,7 +68,6 @@ class StandardPTO:
         self.startDate = datetime.strptime(config['employment_start_date'], '%Y-%m-%d')
         self.lost = 0
         self.accrual = [x / 12 for x in config['standard_pto']['yearly_accrual']]
-        self.lost = 0
 
     def forward(self, eom_date):
         monthNo = eom_date.month
@@ -88,5 +94,9 @@ class StandardPTO:
                 self.bal -= abs(qty)
                 return True
             else:
+                logger.warning(
+                    "%s: insufficient balance on %s — requested %s, have %s",
+                    self.type, eom_date.date(), qty, self.bal,
+                )
                 return False
         return True

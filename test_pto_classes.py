@@ -76,6 +76,15 @@ class TestFlexiblePTO:
         assert result is False
         assert pto.bal == 5
 
+    def test_use_insufficient_logs_warning(self, caplog):
+        import logging
+        pto = FlexiblePTO(TEST_CONFIG)
+        pto.bal = 5
+        with caplog.at_level(logging.WARNING, logger='pto_classes'):
+            pto.use(8, datetime(2023, 1, 31))
+        assert any('insufficient balance' in r.message for r in caplog.records)
+        assert any('Flexible' in r.message for r in caplog.records)
+
 
 class TestStandardPTO:
     def test_accrual_year0(self):
@@ -116,3 +125,12 @@ class TestStandardPTO:
         result = pto.use(8, datetime(2023, 1, 31))
         assert result is False
         assert pto.bal == 5
+
+    def test_use_insufficient_logs_warning(self, caplog):
+        import logging
+        pto = StandardPTO(TEST_CONFIG)
+        pto.bal = 5
+        with caplog.at_level(logging.WARNING, logger='pto_classes'):
+            pto.use(8, datetime(2023, 1, 31))
+        assert any('insufficient balance' in r.message for r in caplog.records)
+        assert any('Std' in r.message for r in caplog.records)

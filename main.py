@@ -1,10 +1,13 @@
 import datetime as dt
+import logging
 from pathlib import Path
 
 import pandas as pd
 import plotly.graph_objects as go
 
 from pto_classes import FlexiblePTO, StandardPTO
+
+logger = logging.getLogger(__name__)
 
 
 def read_schedule(filename, sheetName):
@@ -142,6 +145,8 @@ def plot_pto_results(results: pd.DataFrame, save_path: Path = None) -> go.Figure
     return fig
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.WARNING, format='%(levelname)s: %(message)s')
+
     from config_loader import config
     flexible = FlexiblePTO(config.model_dump())
     standard = StandardPTO(config.model_dump())
