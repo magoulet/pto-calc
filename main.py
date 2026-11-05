@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 import plotly.graph_objects as go
+from dateutil.relativedelta import relativedelta
 
 from pto_classes import FlexiblePTO, StandardPTO
 
@@ -154,6 +155,12 @@ if __name__ == '__main__':
     filename = config.schedule_file
     schedule = read_schedule(filename, 'baseline')
 
+    employment_start = flexible.startDate
+
+    def tenure_label(end_date):
+        delta = relativedelta(end_date, employment_start)
+        return f"y{delta.years} m{delta.months}"
+
     data = []
 
     for row in schedule.itertuples():
@@ -169,7 +176,8 @@ if __name__ == '__main__':
             standard.bal, 
             flexible.lost,
             standard.lost, 
-            sum([flexible.bal, standard.bal])/8
+            sum([flexible.bal, standard.bal])/8,
+            tenure_label(row.end_date),
             ])
 
     results = pd.DataFrame(data)
@@ -180,6 +188,7 @@ if __name__ == '__main__':
         'Flexible Lost', 
         'Std Lost', 
         'Total Days',
+        'Tenure',
         ]
     print("PTO hours left over at end of given period\n")
     print(results)
