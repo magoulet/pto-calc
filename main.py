@@ -5,6 +5,9 @@ from pathlib import Path
 import pandas as pd
 import plotly.graph_objects as go
 from dateutil.relativedelta import relativedelta
+from rich import box
+from rich.console import Console
+from rich.table import Table
 
 from pto_classes import FlexiblePTO, StandardPTO
 
@@ -22,6 +25,31 @@ def read_schedule(filename, sheetName):
     df['flexible'] = pd.to_numeric(df['flexible'], errors='coerce')
     df['standard'] = pd.to_numeric(df['standard'], errors='coerce')
     return df
+
+
+def print_results(results: pd.DataFrame, current_period=None):
+    """Print PTO results as a styled table, highlighting the current period row."""
+    console = Console(width=120)
+    table = Table(
+        title="PTO hours left over at end of given period",
+        box=box.SIMPLE,
+        header_style="bold",
+    )
+    for col in results.columns:
+        table.add_column(col)
+
+    def fmt(v):
+        if isinstance(v, float):
+            return f"{v:.2f}"
+        if hasattr(v, 'strftime'):
+            return v.strftime('%Y-%m-%d')
+        return str(v)
+
+    for _, row in results.iterrows():
+        is_current = current_period is not None and row['periodEnd'] == current_period
+        style = "bold green" if is_current else None
+        table.add_row(*(fmt(v) for v in row), style=style)
+    console.print(table)
 
 
 def plot_pto_results(results: pd.DataFrame, save_path: Path = None) -> go.Figure:
@@ -197,8 +225,11 @@ if __name__ == '__main__':
     window_end = today + relativedelta(months=config.display.lookforward_months)
     results = results[results['periodEnd'].dt.date.between(window_start, window_end)]
 
-    print("PTO hours left over at end of given period\n")
-    print(results)
+    # Identify the current period: the earliest period end on/after today.
+    current_rows = results[results['periodEnd'].dt.date >= today]
+    current_period = current_rows['periodEnd'].iloc[0] if not current_rows.empty else None
+
+    print_results(results, current_period)
 
     fig = plot_pto_results(results)
     fig.show()

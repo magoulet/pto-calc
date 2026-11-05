@@ -4,3 +4,4 @@ odfpy
 pandas
 plotly
 pydantic
+rich
