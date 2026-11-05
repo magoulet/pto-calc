@@ -190,6 +190,13 @@ if __name__ == '__main__':
         'Total Days',
         'Tenure',
         ]
+
+    # Rolling display window: keep only periods around today (display only).
+    today = dt.date.today()
+    window_start = today - relativedelta(months=config.display.lookback_months)
+    window_end = today + relativedelta(months=config.display.lookforward_months)
+    results = results[results['periodEnd'].dt.date.between(window_start, window_end)]
+
     print("PTO hours left over at end of given period\n")
     print(results)
 

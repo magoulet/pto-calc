@@ -1,6 +1,11 @@
 employment_start_date = "YYYY-MM-DD"
 schedule_file = "/path/to/pto_schedule.ods"
 
+[display]
+# Rolling window (months around today) for display purposes only.
+lookback_months = 6
+lookforward_months = 12
+
 [standard_pto]
 start_balance = 0
 max_rollover = 160
